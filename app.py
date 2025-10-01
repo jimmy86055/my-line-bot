@@ -1,4 +1,4 @@
-# 檔案名稱：app.py 【最終修正版 - 移除班級資訊 & 修正鑰匙問題】
+# 檔案名稱：app.py 【最新最終版 - 支援單一學生 & 全班名單查詢】
 import os
 import requests
 from flask import Flask, request, abort
@@ -8,8 +8,8 @@ from linebot.models import MessageEvent, TextMessage, TextSendMessage
 
 app = Flask(__name__)
 
-# --- 【重要】請在這裡，重新貼上您自己的三把鑰匙 ---
-CHANNEL_SECRET = '4d92e35cb5d0d79ca1c48683c92180ed'
+# --- 【重要】請再次確認這裡填寫的是您自己的三把鑰匙 ---
+CHANNEL_SECRET = 'U60dd82a9d304a8cd06e104e920af21e4'
 CHANNEL_ACCESS_TOKEN = 'onEH5gjVrj0VB6CaDmsXsMHhjVjDeSesAp5/qL/EFeu2fRx6vRHrO308PI3AFcojtmySmmW2eq7qnbDLG8GBfmbD9PP+qYn2NPAZJPmLs2bkLwKD3WJA6JRoBNWrpdxcbAXOmofGkbsr4Z0visq/vwdB04t89/1O/w1cDnyilFU='
 GAS_API_URL = 'https://script.google.com/macros/s/AKfycbxmTDa78iUMSUNvJtG-PjYlMJu8kgmkmQfI9AVmiTuyTUuKfou5xR6_LRhjaSUMk2gY-w/exec'
 # ------------------------------------
@@ -33,7 +33,12 @@ def handle_message(event):
     try:
         response = requests.get(GAS_API_URL, params={'keyword': keyword})
         data = response.json()
-        if data.get('status') == 'success':
+
+        # 檢查後端回傳的狀態
+        status = data.get('status')
+
+        if status == 'success_single':
+            # 如果是單一學生的資料
             student_data = data.get('data', {})
             reply_text = (
                 f"👤 {student_data.get('幼生姓名', 'N/A')}\n"
@@ -45,9 +50,20 @@ def handle_message(event):
                 f"🏠 通訊地址：{student_data.get('通訊地址', 'N/A')}"
             )
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
-        else:
-            reply_text = f"❌ 查無資料：{keyword}"
+
+        elif status == 'success_multiple':
+            # 如果是多筆學生的名單
+            student_list = data.get('data', [])
+            # 組合名單文字，記得確認試算表標題是'幼生姓名'
+            student_names = [f"· {s.get('幼生姓名', '')}" for s in student_list]
+
+            reply_text = f"📖 {keyword} 全班名單：\n--------------------\n" + "\n".join(student_names)
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
+
+        else: # status == 'not_found' or 'error'
+            reply_text = f"❌ 查無「{keyword}」的相關資料"
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
+
     except:
         reply_text = "⚠️ 系統連線異常，請稍後再試。"
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
