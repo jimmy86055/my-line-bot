@@ -1,4 +1,4 @@
-# 檔案名稱：app.py 【最新版 - 移除班級資訊】
+# 檔案名稱：app.py 【最終修正版 - 移除班級資訊 & 修正鑰匙問題】
 import os
 import requests
 from flask import Flask, request, abort
@@ -8,8 +8,8 @@ from linebot.models import MessageEvent, TextMessage, TextSendMessage
 
 app = Flask(__name__)
 
-# --- 您的鑰匙和網址 (請確認這裡還是您自己的設定) ---
-CHANNEL_SECRET = '6861cc94549ab2e7c7532d1db7529445'
+# --- 【重要】請在這裡，重新貼上您自己的三把鑰匙 ---
+CHANNEL_SECRET = '4d92e35cb5d0d79ca1c48683c92180ed'
 CHANNEL_ACCESS_TOKEN = 'onEH5gjVrj0VB6CaDmsXsMHhjVjDeSesAp5/qL/EFeu2fRx6vRHrO308PI3AFcojtmySmmW2eq7qnbDLG8GBfmbD9PP+qYn2NPAZJPmLs2bkLwKD3WJA6JRoBNWrpdxcbAXOmofGkbsr4Z0visq/vwdB04t89/1O/w1cDnyilFU='
 GAS_API_URL = 'https://script.google.com/macros/s/AKfycbxmTDa78iUMSUNvJtG-PjYlMJu8kgmkmQfI9AVmiTuyTUuKfou5xR6_LRhjaSUMk2gY-w/exec'
 # ------------------------------------
@@ -35,7 +35,6 @@ def handle_message(event):
         data = response.json()
         if data.get('status') == 'success':
             student_data = data.get('data', {})
-            # --- 我們在這裡組合要回傳的漂亮格式 ---
             reply_text = (
                 f"👤 {student_data.get('幼生姓名', 'N/A')}\n"
                 f"--------------------\n"
@@ -45,7 +44,6 @@ def handle_message(event):
                 f"📞 聯絡電話：{student_data.get('聯絡電話', 'N/A')}\n"
                 f"🏠 通訊地址：{student_data.get('通訊地址', 'N/A')}"
             )
-            # ------------------------------------
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
         else:
             reply_text = f"❌ 查無資料：{keyword}"
