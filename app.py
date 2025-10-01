@@ -9,7 +9,7 @@ from linebot.models import MessageEvent, TextMessage, TextSendMessage
 app = Flask(__name__)
 
 # --- 您的鑰匙和網址已修正完畢 ---
-CHANNEL_SECRET='6861cc94549ab2e7c7532d1db7529445'
+CHANNEL_SECRET='4d92e35cb5d0d79ca1c48683c92180ed'
 CHANNEL_ACCESS_TOKEN='onEH5gjVrj0VB6CaDmsXsMHhjVjDeSesAp5/qL/EFeu2fRx6vRHrO308PI3AFcojtmySmmW2eq7qnbDLG8GBfmbD9PP+qYn2NPAZJPmLs2bkLwKD3WJA6JRoBNWrpdxcbAXOmofGkbsr4Z0visq/vwdB04t89/1O/w1cDnyilFU='
 GAS_API_URL='https://script.google.com/macros/s/AKfycbxmTDa78iUMSUNvJtG-PjYlMJu8kgmkmQfI9AVmiTuyTUuKfou5xR6_LRhjaSUMk2gY-w/exec'
 # ------------------------------------
@@ -61,3 +61,4 @@ if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
 
     app.run(host='0.0.0.0', port=port)
+
