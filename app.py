@@ -1,4 +1,4 @@
-# 檔案名稱：app.py 【新版 - 可直接輸入姓名查詢】
+# 檔案名稱：app.py 【最新版 - 移除班級資訊】
 import os
 import requests
 from flask import Flask, request, abort
@@ -29,8 +29,6 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    # 我們移除了 if user_message.startswith('查詢 ') 的檢查
-    # 現在，任何傳進來的文字都會被當成關鍵字
     keyword = event.message.text
     try:
         response = requests.get(GAS_API_URL, params={'keyword': keyword})
@@ -38,7 +36,6 @@ def handle_message(event):
         if data.get('status') == 'success':
             student_data = data.get('data', {})
             # --- 我們在這裡組合要回傳的漂亮格式 ---
-            # 記得確認下面的欄位名稱，跟您Google試算表第一排的標題「完全一樣」
             reply_text = (
                 f"👤 {student_data.get('幼生姓名', 'N/A')}\n"
                 f"--------------------\n"
